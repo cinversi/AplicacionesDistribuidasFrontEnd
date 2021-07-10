@@ -9,6 +9,12 @@ import Loading from '../../components/Loading'
 import ListSubastas from '../../components/subastas/ListSubastas'
 import { getCurrentUser, getDocumentById, getMoreSubastas,getSubastas, getSubastasComun,getSubastasEspecial,getSubastasPlata,getSubastasOro,getSubastasPlatino } from '../../utils/actions'
 
+import config from'../../config';
+import { API_URL,REACT_APP_BACKEND_GETALLSUBASTAS} from '@env';
+
+import axios from 'axios'
+import { configureFonts } from 'react-native-paper'
+//const API_HOST = config.REACT_APP_BACKEND_URL
 
 export default function Subastas({ navigation }) {
     const [user, setUser] = useState(null)
@@ -20,93 +26,123 @@ export default function Subastas({ navigation }) {
     const [currentUser, setcurrentUser] = useState(false)
     const limitSubastas = 25
 
-    useEffect(() => {
-        firebase.auth().onAuthStateChanged((userInfo) => {
-            userInfo ? (setUser(true) && setcurrentUser(true)) : setUser(false)
-        })
-    }, [])
+    // useEffect(() => {
+    //     firebase.auth().onAuthStateChanged((userInfo) => {
+    //         userInfo ? (setUser(true) && setcurrentUser(true)) : setUser(false)
+    //     })
+    // }, [])
 
-    console.log("user",user)
-    console.log("currentuser",currentUser)
+    // console.log("user",user)
+    // console.log("currentuser",currentUser)
 
-    useFocusEffect(
-        useCallback(() => {
-            async function getData() {
-                setLoading(true)
-                const response = await getDocumentById("users", getCurrentUser().uid);
-                setUsuario(response.document)
-                setUsuarioCategoria(response.document.categoria)
-                setLoading(false)
-            }
-            getData()
-        }, [])
-    )
-
-    useFocusEffect(
-        useCallback(() => {
-            async function getDataCategorias() {
-                setLoading(true)
-                if(user==false){
-                    const response = await getSubastas(limitSubastas)
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }else if(usuarioCategoria=="COMUN"){
-                    const response = await getSubastasComun(limitSubastas)
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }else if(usuarioCategoria=="ESPECIAL"){
-                    const response = await getSubastasEspecial(limitSubastas)
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }else if(usuarioCategoria=="PLATA"){
-                    const response = await getSubastasPlata(limitSubastas)
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }else if(usuarioCategoria=="ORO"){
-                    const response = await getSubastasOro(limitSubastas)
-                    console.log("entre a este if")
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }else if(usuarioCategoria=="PLATINO"){
-                    const response = await getSubastasPlatino(limitSubastas)
-                    if (response.statusResponse) {
-                        setStartSubasta(response.startSubasta)
-                        setSubastas(response.subastas)
-                    }
-                }
-                setLoading(false)
-            }
-            getDataCategorias()
-        }, [])
-    )
-
-    const handleLoadMore = async() => {
-        if (!startSubasta) {
-            return
-        }
-
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         async function getData() {
+    //             setLoading(true)
+    //             const response = await getDocumentById("users", getCurrentUser().uid);
+    //             setUsuario(response.document)
+    //             setUsuarioCategoria(response.document.categoria)
+    //             setLoading(false)
+    //         }
+    //         getData()
+    //     }, [])
+    // )
+    // const getClientes = async() => {
+    //     return fetch(API_URL+REACT_APP_BACKEND_GETALLSUBASTAS)
+    //     .then(
+    //       response => this.handleServerResponse(response),
+    //       console.log(response),
+    //       error => this.handleServerError(error)
+    //     ).catch(error => this.handleServerError(error))
+    // }
+    console.log("printeo",config.API_URL+config.REACT_APP_BACKEND_GETALLSUBASTAS)
+    React.useEffect(() => {
         setLoading(true)
-        const response = await getMoreSubastas(limitSubastas, startSubasta)
-        if (response.statusResponse) {
-            setStartSubasta(response.startSubasta)
-            setSubastas([...subastas, ...response.subastas])
-        }
-        setLoading(false)
-    }
+         axios.get(config.API_URL+config.REACT_APP_BACKEND_GETALLSUBASTAS).then(res => {
+          setSubastas(res.data);
+          //console.log(res.data)
+          setLoading(false)
+        }).catch(err => {
+          console.log(err);
+        });
+      }, [])
 
-    if (user === null) {
-        return <Loading isVisible={true} text="Cargando..."/>
-    }
+    // useEffect(() =>{
+    //     getSubastas()
+    // },[])
+
+    // const getSubastas = async()=>{
+    //     const {data} = await axios.get(URL)
+    //     const {subastas} = data
+    //     setSubastas(subastas)
+    //     console.log(data)
+    // }
+
+    // useFocusEffect(
+    //     useCallback(() => {
+    //         async function getDataCategorias() {
+    //             setLoading(true)
+    //             if(user==false){
+    //                 const response = await getSubastas(limitSubastas)
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }else if(usuarioCategoria=="COMUN"){
+    //                 const response = await getSubastasComun(limitSubastas)
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }else if(usuarioCategoria=="ESPECIAL"){
+    //                 const response = await getSubastasEspecial(limitSubastas)
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }else if(usuarioCategoria=="PLATA"){
+    //                 const response = await getSubastasPlata(limitSubastas)
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }else if(usuarioCategoria=="ORO"){
+    //                 const response = await getSubastasOro(limitSubastas)
+    //                 console.log("entre a este if")
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }else if(usuarioCategoria=="PLATINO"){
+    //                 const response = await getSubastasPlatino(limitSubastas)
+    //                 if (response.statusResponse) {
+    //                     setStartSubasta(response.startSubasta)
+    //                     setSubastas(response.subastas)
+    //                 }
+    //             }
+    // //             setLoading(false)
+    // //         }
+    // //         getDataCategorias()
+    // //     }, [])
+    // // )
+
+    // const handleLoadMore = async() => {
+    //     if (!startSubasta) {
+    //         return
+    //     }
+
+    //     setLoading(true)
+    //     const response = await getMoreSubastas(limitSubastas, startSubasta)
+    //     if (response.statusResponse) {
+    //         setStartSubasta(response.startSubasta)
+    //         setSubastas([...subastas, ...response.subastas])
+    //     }
+    //     setLoading(false)
+    // }
+
+    // if (user === null) {
+    //     return <Loading isVisible={true} text="Cargando..."/>
+    // }
 
     return (
         <View style={styles.viewBody}>
@@ -115,7 +151,7 @@ export default function Subastas({ navigation }) {
                     <ListSubastas
                         subastas={subastas}
                         navigation={navigation}
-                        handleLoadMore={handleLoadMore}
+                        //handleLoadMore={handleLoadMore}
                     />
                 ) : (
                     <View style={styles.notFoundView}>
