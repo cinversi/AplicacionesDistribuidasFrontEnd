@@ -16,37 +16,20 @@ import { getDocumentById } from '../../utils/actions'
 const widthScreen = Dimensions.get("window").width
 
 export default function Subasta({ navigation, route }) {
-    const { id, name } = route.params
+    const { id, descripcion,moneda, allImages, subasta } = route.params
     const toastRef = useRef()
     
-    const [subasta, setSubasta] = useState(null)
     const [activeSlide, setActiveSlide] = useState(0)
     const [userLogged, setUserLogged] = useState(false)
     const [currentUser, setCurrentUser] = useState(null)
     const [loading, setLoading] = useState(false)
-    const [catItems, setCatItems] = useState([])
 
     firebase.auth().onAuthStateChanged(user => {
         user ? setUserLogged(true) : setUserLogged(false)
         setCurrentUser(user)
     })
 
-    navigation.setOptions({ title: name })
-
-    useFocusEffect(
-        useCallback(() => {
-            (async() => {
-                const response = await getDocumentById("subastas", id)
-                if (response.statusResponse) {
-                    setSubasta(response.document)
-                    setCatItems(response.document.catalogo)
-                } else {
-                    setSubasta({})
-                    Alert.alert("Ocurrió un problema cargando la subasta, intente más tarde.")
-                }
-            })()
-        }, [])
-    )
+    navigation.setOptions({ title: descripcion })
 
     if (!subasta) {
         return <Loading isVisible={true} text="Cargando..."/>
@@ -55,34 +38,33 @@ export default function Subasta({ navigation, route }) {
     return (
         <ScrollView style={styles.viewBody}>
             <CarouselImages
-                images={subasta.images}
+                images={allImages}
                 height={250}
                 width={widthScreen}
                 activeSlide={activeSlide}
                 setActiveSlide={setActiveSlide}
             />
             <TitleSubasta
-                name={subasta.name}
-                description={subasta.description}
-                categoria={subasta.categoria}
-                fechaSubastar={subasta.fechaSubastar}
-                horaSubastar={subasta.horaSubastar}
-                horaFinSubasta={subasta.horaFinSubasta}
-                listadoPujas={subasta.listadoPujas}
-                moneda={subasta.moneda}
+                descripcion={descripcion}
+                categoria={subasta.item.categoria}
+                fecha={subasta.item.fecha}
+                horaInicio={subasta.item.horaInicio}
+                horaFin={subasta.item.horaFin}
+                //listadoPujas={subasta.listadoPujas}
+                moneda={moneda}
             />
             <ListItem
                 style={styles.containerListItem}
             ></ListItem>
             <Text style={styles.catalogoTitle}>Catálogo</Text>
             {
-                size(catItems) > 0 ? (
+                size(subasta.item.items) > 0 ? (
                     <ListItems
-                        catItems={catItems}
+                        catItems={subasta.item.items}
                         id={id}
-                        horaComienzoSubasta={subasta.horaSubastar}
-                        horaFinSubasta={subasta.horaFinSubasta}
-                        fechaSubasta={subasta.fechaSubastar}
+                        horaComienzoSubasta={subasta.item.horaInicio}
+                        horaFinSubasta={subasta.item.horaFin}
+                        fechaSubasta={subasta.item.fecha}
                         subasta={subasta}
                         currentUser={currentUser}
                         navigation={navigation}
@@ -101,17 +83,16 @@ export default function Subasta({ navigation, route }) {
     )
 }
 
-function TitleSubasta({ name, description, categoria, fechaSubastar, horaSubastar, horaFinSubasta, moneda}) {
+function TitleSubasta({ descripcion, categoria, fecha, horaInicio, horaFin, moneda}) {
     return (
         <View style={styles.viewSubastaTitle}>
             <View style={styles.viewSubastaContainer}>
-                <Text style={styles.nameSubasta}>{name}</Text>
+                <Text style={styles.descripcionSubasta}>{descripcion}</Text>
             </View>
             <Text style={styles.categoriaSubasta}>Categoría {categoria}</Text>
-            <Text style={styles.descriptionSubasta}>{description}</Text>
-            <Text style={styles.descriptionSubasta}>Fecha a Subastar: {fechaSubastar}</Text>
-            <Text style={styles.descriptionSubasta}>Horario a Subastar: {horaSubastar}</Text>
-            <Text style={styles.descriptionSubasta}>Horario de Finalización: {horaFinSubasta}</Text>
+            <Text style={styles.descriptionSubasta}>Fecha a Subastar: {fecha}</Text>
+            <Text style={styles.descriptionSubasta}>Horario a Subastar: {horaInicio}</Text>
+            <Text style={styles.descriptionSubasta}>Horario de Finalización: {horaFin}</Text>
             <Text style={styles.descriptionSubasta}>Moneda: ${moneda}</Text>
         </View>
     )
@@ -139,7 +120,7 @@ const styles = StyleSheet.create({
         color: "gray",
         textAlign: "justify"
     },
-    nameSubasta: {
+    descripcionSubasta: {
         fontWeight: "bold"
     },
     categoriaSubasta: {
