@@ -12,8 +12,6 @@ const widthScreen = Dimensions.get("window").width;
 
 export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
   const [formData, setFormData] = useState(defaultFormValues());
-  const [errorName, setErrorName] = useState(null);
-  const [errorDescription, setErrorDescription] = useState(null);
   const [errorCheckbox, setErrorCheckbox] = useState("");
   const [imagesSelected, setImagesSelected] = useState([]);
   const [inputs, setInputs] = useState([
@@ -109,8 +107,6 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
     setLoading(true);
     const responseUploadImages = await uploadImages();
     const subasta = {
-      name: formData.name,
-      description: formData.description,
       images: responseUploadImages,
       catalogo: inputs,
       listadoPujas: [],
@@ -153,16 +149,6 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
     clearErrors();
     let isValid = true;
 
-    if (isEmpty(formData.name)) {
-      setErrorName("Debes ingresar el nombre de la subasta.");
-      isValid = false;
-    }
-
-    if (isEmpty(formData.description)) {
-      setErrorDescription("Debes ingresar una descripción de la subasta.");
-      isValid = false;
-    }
-
     if(checked==false) {
       setErrorCheckbox("Debes aceptar las condiciones.")
       isValid = false
@@ -172,8 +158,6 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
   };
 
   const clearErrors = () => {
-    setErrorDescription(null);
-    setErrorName(null);
     setErrorCheckbox(null);
   };
 
@@ -183,9 +167,6 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
       <FormAdd
         formData={formData}
         setFormData={setFormData}
-        errorName={errorName}
-        errorDescription={errorDescription}
-        // errorPrecioBase={errorPrecioBase}
         setDataMoneda={setDataMoneda}
       />
       {inputs.map((input, key) => (
@@ -340,8 +321,6 @@ function UploadImage({ toastRef, imagesSelected, setImagesSelected }) {
 function FormAdd({
   formData,
   setFormData,
-  errorName,
-  errorDescription,
   setDataMoneda,
 }) {
   const onChange = (e, type) => {
@@ -351,20 +330,6 @@ function FormAdd({
 
   return (
     <View style={styles.viewForm}>
-      <Input
-        placeholder="Nombre de la subasta"
-        defaultValue={formData.name}
-        onChange={(e) => onChange(e, "name")}
-        errorMessage={errorName}
-      />
-      <Input
-          placeholder="Descripción de la subasta"
-          multiline
-          containerStyle={styles.textArea}
-          defaultValue={formData.description}
-          onChange={(e) => onChange(e, "description")}
-          errorMessage={errorDescription}
-        />
       <Text>Selecciona la moneda deseada: </Text>
       <View style={styles.currencyView}>
         <CurrencyPicker
@@ -418,8 +383,6 @@ function FormAdd({
 
 const defaultFormValues = () => {
   return {
-    name: "",
-    description: ""
   };
 };
 

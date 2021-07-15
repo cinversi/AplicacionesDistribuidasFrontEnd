@@ -25,12 +25,10 @@ export default function Subastas({ navigation }) {
             userInfo ? (setUser(true) && setcurrentUser(true)) : setUser(false)
         })
         setLoading(true)
-        let response = ""
-        response = getCurrentUser().uid;
-        const result = await getDocumentById("users", getCurrentUser().uid);
-        const categoria = result.categoria
-        console.log("categoria de usuario",categoria)
-        if(response==""){
+        let response = null
+        response = await getCurrentUser().uid;
+        console.log(response)
+        if(response==null){
             axios.get(config.API_URL+config.REACT_APP_BACKEND_GETALLSUBASTAS).then(res => {
                 setSubastas(res.data);
                 setLoading(false)

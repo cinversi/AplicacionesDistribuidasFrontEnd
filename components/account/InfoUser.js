@@ -15,13 +15,17 @@ export default function InfoUser({ user, setLoading, setLoadingText }) {
             async function getData() {
                 const response = await getDocumentById("users", user.uid)
                 setUsuario(response.document)
-                doRegisterPersona(response.document)
-                doRegisterUser(response.document)
-                doRegisterCliente(response.document)
+                await doRegisterPersona(response.document)
+                await createUsers(response.document)
             }
             getData()
         }, [])
     )
+
+    const createUsers = async (response) => {
+        await doRegisterUser(response)
+        await doRegisterCliente(response)
+    }
 
     const changePhoto = async() => {
         const result = await loadImageFromGallery([1, 1])
