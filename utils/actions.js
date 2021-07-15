@@ -12,6 +12,8 @@ import { Platform } from 'react-native'
 
 import uuid from 'random-uuid-v4'
 
+import config from '../config'
+import axios from 'axios'
 
 const db = firebase.firestore(firebaseApp)
 const fireSQL = new FireSQL(firebase.firestore(), { includeId: "id" })
@@ -445,12 +447,17 @@ export const addNewPaymentMethod = async(idUser,number,expiry,cvc,name,postalCod
     try {
         const paymentUuid = uuid();
         db.collection("users").doc(idUser).update({medioPago:firebase.firestore.FieldValue.arrayUnion(...[{uuid:paymentUuid,number:number,expiry:expiry,cvc:cvc,name:name,postalCode:postalCode,type:type}])})
-     } catch (error) {
+        axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDMEDIOPAGO + `?&user_id=${idUser}&numero=${number}&expiracion=${expiry}&cvc=${cvc}&nombre=${name}&codigoPostal=${postalCode}&tipo=${type}`).then(res => {
+        }).catch(err => {
+            console.log(err)
+          });
+    } catch (error) {
         result.statusResponse = false
         result.error = error
     }
     return result   
 }
+
 
 export const getItemsCatalogo = async(limitSubastas) => {
     const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
@@ -756,4 +763,26 @@ export const updatePujadorSubasta = async(collection, id, estado) => {
         result.error = error
     }
     return result     
+}
+
+export const doRegisterPersona = async(usuario) => {
+    const nombre = usuario.nombre + ' ' + usuario.apellido
+    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPERSONA + `?&nombre=${nombre}&documento=${usuario.dni}&direccion=${usuario.direccion}`).then(res => {
+    }).catch(err => {
+      });
+    return
+}
+
+export const doRegisterUser = async(usuario) => {
+    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDUSER + `?&email=${usuario.email}&user_id=${usuario.id}`).then(res => {
+    }).catch(err => {
+      });
+    return
+}
+
+export const doRegisterCliente = async(usuario) => {
+    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDCLIENTE + `?&categoria=${usuario.categoria}`).then(res => {
+    }).catch(err => {
+      });
+    return
 }

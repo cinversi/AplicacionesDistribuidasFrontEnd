@@ -1,5 +1,5 @@
 import React,{ useState } from 'react'
-import { Alert,StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { Button, Icon, Input } from 'react-native-elements'
 import { useNavigation } from '@react-navigation/native'
 import { isEmpty } from 'lodash'
@@ -7,9 +7,6 @@ import { isEmpty } from 'lodash'
 import { validateEmail } from '../../utils/helpers'
 import { loginWithEmailAndPassword } from '../../utils/actions'
 import Loading from '../Loading'
-
-import config from '../../config'
-import axios from 'axios'
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState(false)
@@ -24,24 +21,22 @@ export default function LoginForm() {
         setFormData({...formData, [type]:e.nativeEvent.text})
     }
 
-    const emailUser = formData.email
     const doLogin = async() => {
         if (!validateData()) {
             return;
         }
+
         setLoading(true)
-        axios.get(config.API_URL + config.REACT_APP_BACKEND_LOGIN + `?&email=${formData.email}&password=${formData.password}`).then(res => {
-            setLoading(false)
-            if(res.data == 'generatepassword'){
-                navigation.navigate("generate-password",{emailUser})
-            }else if (res.data == 'login'){
-                navigation.navigate("account")
-            }
-        }).catch(err => {
-            setLoading(false);
-            Alert.alert("Ha ocurrido un error al iniciar sesion intenta nuevamente.")
+        const result = await loginWithEmailAndPassword(formData.email, formData.password)
+        setLoading(false)
+
+        if (!result.statusResponse) {
+            setErrorEmail(result.error)
+            setErrorPassword(result.error)
             return
-          });
+        }
+
+        navigation.navigate("account")
     }
 
     const validateData = () => {

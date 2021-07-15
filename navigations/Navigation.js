@@ -37,7 +37,7 @@ export default function Navigation() {
     return (
         <NavigationContainer>
             <Tab.Navigator
-                initialRouteName="subastas"
+                initialRouteName="account"
                 tabBarOptions={{
                     inactiveTintColor: "",
                     activeTintColor: "#442484"

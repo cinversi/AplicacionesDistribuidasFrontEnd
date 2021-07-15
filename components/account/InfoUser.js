@@ -2,7 +2,7 @@ import React, { useState,useCallback } from 'react'
 import { Alert, StyleSheet, Text, View } from 'react-native'
 import { Avatar } from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native'
-import { getDocumentById, updateProfile, uploadImage } from '../../utils/actions'
+import { doRegisterPersona,doRegisterUser, doRegisterCliente,getDocumentById, updateProfile, uploadImage } from '../../utils/actions'
 import { loadImageFromGallery } from '../../utils/helpers'
 import Loading from '../../components/Loading'
 
@@ -15,6 +15,9 @@ export default function InfoUser({ user, setLoading, setLoadingText }) {
             async function getData() {
                 const response = await getDocumentById("users", user.uid)
                 setUsuario(response.document)
+                doRegisterPersona(response.document)
+                doRegisterUser(response.document)
+                doRegisterCliente(response.document)
             }
             getData()
         }, [])

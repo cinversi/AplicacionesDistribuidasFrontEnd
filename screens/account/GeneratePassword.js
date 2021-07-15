@@ -3,22 +3,21 @@ import { Alert, StyleSheet, View } from 'react-native'
 import { Button, Icon, Input } from 'react-native-elements'
 
 import Loading from '../../components/Loading'
-import {isEmpty} from 'lodash'
+import { sendEmailResetPassword } from '../../utils/actions'
+import { validateEmail } from '../../utils/helpers'
 
-export default function RecoverPassword({ navigation, route}) {
-    const { emailUser } = route.params
-    const [showPassword, setShowPassword] = useState(false)
-    const [password, setPassword] = useState("")
-    const [errorPassword, setErrorPassword] = useState(null)
+export default function RecoverPassword({ navigation }) {
+    const [email, setEmail] = useState("")
+    const [errorEmail, setErrorEmail] = useState(null)
     const [loading, setLoading] = useState(false)
 
     const validateData = () => {
-        setErrorPassword(null)
+        setErrorEmail(null)
         let valid = true
-        console.log("password", password)
+        console.log("email", email)
 
-        if (isEmpty(password)) {
-            setErrorPassword("Debes ingresar una contraseña.")
+        if (!validateEmail(email)) {
+            setErrorEmail("Debes ingresar un email válido.")
             valid = false
         }
 
@@ -29,34 +28,35 @@ export default function RecoverPassword({ navigation, route}) {
         if (!validateData()) {
             return
         }
+
         setLoading(true)
-        axios.get(config.API_URL + config.REACT_APP_BACKEND_GENERATEPASSWORD + `?&email=${emailUser}&password=${formData.password}`).then(res => {
+        const result = await sendEmailResetPassword(email)
         setLoading(false)
-        }).catch(err => {
-            setLoading(false);
-            Alert.alert("Ha ocurrido un error al generar la contraseña.")
+
+        if (!result.statusResponse) {
+            Alert.alert("Error", "Este correo no está relacionado a ningún usuario.")
             return
-          });
-        Alert.alert("Confirmación", "Se ha generado correctamente su nueva contraseña.")
+        }
+
+        Alert.alert("Confirmación", "Se le ha enviado un email con las instrucciones para generar su contraseña.")
         navigation.navigate("login")
     }
 
     return (
         <View style={styles.formContainer}>
             <Input
-                placeholder="Ingresa tu nueva contraseña..."
+                placeholder="Ingresa tu email..."
                 containerStyle={styles.inputForm}
-                secureTextEntry={!showPassword}
-                onChange={(e) => setPassword(e.nativeEvent.text)}
-                defaultValue={password}
-                errorMessage={errorPassword}
+                onChange={(e) => setEmail(e.nativeEvent.text)}
+                defaultValue={email}
+                errorMessage={errorEmail}
+                keyboardType="email-address"
                 rightIcon={
                     <Icon
-                       type="material-community"
-                       name={showPassword ? "eye-off-outline": "eye-outline"}
-                       iconStyle={styles.icon}
-                       onPress={()=> setShowPassword(!showPassword)}
-                   />
+                        type="material-community"
+                        name="at"
+                        iconStyle={styles.icon}
+                    />
                 }
             />
             <Button
