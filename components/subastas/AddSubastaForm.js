@@ -17,8 +17,8 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
   const [inputs, setInputs] = useState([
     {
       key: "",
-      nombreItem: "",
       descripcion: "",
+      descripcionCompleta: "",
       cantidad: "",
       artista: "",
       fechaObra: "",
@@ -33,8 +33,8 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
     const _inputs = [...inputs];
     _inputs.push({
       key: "",
-      nombreItem: "",
       descripcion: "",
+      descripcionCompleta: "",
       cantidad: "",
       artista: "",
       fechaObra: "",
@@ -49,17 +49,17 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
     setInputs(_inputs);
   };
 
-  const inputHandler = (text, key) => {
+  const inputHandlerDescripcion = (text, key) => {
     const _inputs = [...inputs];
-    _inputs[key].nombreItem = text;
+    _inputs[key].descripcion = text;
     _inputs[key].itemUuid = uuid()
     _inputs[key].key = key;
     setInputs(_inputs);
   };
 
-  const inputHandlerDescripcion = (text, key) => {
+  const inputHandlerDescripcionCompleta = (text, key) => {
     const _inputs = [...inputs];
-    _inputs[key].descripcion = text;
+    _inputs[key].descripcionCompleta = text;
     _inputs[key].key = key;
     setInputs(_inputs);
   };
@@ -175,14 +175,14 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
             Descripcion del Catálogo:
           </Text>
           <Input
-            placeholder={"Nombre del producto"}
-            value={input.value}
-            onChangeText={(text) => inputHandler(text, key)}
-          />
-          <Input
             placeholder={"Descripcion del producto"}
             value={input.value}
             onChangeText={(text) => inputHandlerDescripcion(text, key)}
+          />
+          <Input
+            placeholder={"Descripcion completa del producto"}
+            value={input.value}
+            onChangeText={(text) => inputHandlerDescripcionCompleta(text, key)}
           />
           <Input
             placeholder={"Cantidad de productos"}

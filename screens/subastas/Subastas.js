@@ -21,14 +21,11 @@ export default function Subastas({ navigation }) {
     useFocusEffect(
         useCallback(() => {
             async function getData() {
-        firebase.auth().onAuthStateChanged((userInfo) => {
+            firebase.auth().onAuthStateChanged((userInfo) => {
             userInfo ? (setUser(true) && setcurrentUser(true)) : setUser(false)
         })
         setLoading(true)
-        let response = null
-        response = await getCurrentUser().uid;
-        console.log(response)
-        if(response==null){
+        if(!user){
             axios.get(config.API_URL+config.REACT_APP_BACKEND_GETALLSUBASTAS).then(res => {
                 setSubastas(res.data);
                 setLoading(false)
@@ -36,6 +33,9 @@ export default function Subastas({ navigation }) {
                 console.log(err);
             });
         }else {
+            let response = null
+            response = await getCurrentUser().uid;
+            console.log(response)
             axios.get(config.API_URL+config.REACT_APP_BACKEND_GETALLCATEGORIASUBASTAS+ `?&user_id=${response}`).then(res => {
                 setSubastas(res.data);
                 setLoading(false)

@@ -123,6 +123,27 @@ export const addDocumentWithoutId = async(collection, data) => {
     const result = { statusResponse: true, error: null }
     try {
         await db.collection(collection).add(data)
+        console.log("esta es la data",data)
+        console.log("////////////////////////////////////////")
+        for (let i=0; i<data.catalogo.length;i++){
+            result[i]=(data.catalogo[i])
+            console.log("este es el data catalogo",data.catalogo[i])
+            console.log("////////////////////////////////////////")
+            console.log("este es el resultado",result[i])
+            console.log("////////////////////////////////////////")
+            console.log("esta es la descripcion",result[i].descripcion)
+            axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPRODUCTO + 
+                `?&user_id=${data.rematador}
+                &descripcionCatalogo=${result[i].descripcion}
+                &descripcionCompleta=${result[i].descripcionCompleta}
+                &cantidad=${result[i].cantidad}
+                &artista_obra=${result[i].artista}
+                &fecha_obra=${result[i].fechaObra}
+                &historia_obra=${result[i].historiaObra}`).then(res => {
+            }).catch(err => {
+                console.log(err)
+              });
+        }
     } catch (error) {
         result.statusResponse = false
         result.error = error
