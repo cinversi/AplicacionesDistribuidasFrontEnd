@@ -6,7 +6,7 @@ import uuid from "random-uuid-v4";
 import CurrencyPicker from "react-native-currency-picker";
 import { Checkbox } from 'react-native-paper'
 import { loadImageFromGallery } from "../../utils/helpers";
-import { addDocumentWithoutId, getCurrentUser, uploadImage} from "../../utils/actions";
+import { addDocumentWithoutId,addFotos, getCurrentUser, uploadImage} from "../../utils/actions";
 
 const widthScreen = Dimensions.get("window").width;
 
@@ -28,26 +28,6 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
   ]);
   const [dataMoneda, setDataMoneda] = useState("");
   const [checked, setChecked] = useState(false)
-
-  const addHandler = () => {
-    const _inputs = [...inputs];
-    _inputs.push({
-      key: "",
-      descripcion: "",
-      descripcionCompleta: "",
-      cantidad: "",
-      artista: "",
-      fechaObra: "",
-      historiaObra: "",
-      itemUuid: uuid()
-        });
-    setInputs(_inputs);
-  };
-
-  const deleteHandler = (key) => {
-    const _inputs = inputs.filter((input, index) => index != key);
-    setInputs(_inputs);
-  };
 
   const inputHandlerDescripcion = (text, key) => {
     const _inputs = [...inputs];
@@ -110,20 +90,20 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
       images: responseUploadImages,
       catalogo: inputs,
       listadoPujas: [],
-      //precioBase: formData.precioBase,
       moneda: dataMoneda ? dataMoneda : 'ARS',
       createAt: new Date(),
       rematador: getCurrentUser().uid,
-      categoria: "",//calcularCategoria(formData.precioBase),
+      categoria: "",
       statusSubasta:'PENDIENTE'
     };
 
     const responseAddDocument = await addDocumentWithoutId("subastas", subasta);
+
     setLoading(false);
 
     if (!responseAddDocument.statusResponse) {
       toastRef.current.show(
-        "Error al grabar la subasta, por favor intenta más tarde.",
+        "Error al cargar el producto, por favor intenta más tarde.",
         3000
       );
       return;
@@ -209,28 +189,9 @@ export default function AddSubastaForm({ toastRef, setLoading, navigation }) {
             imagesSelected={imagesSelected}
             setImagesSelected={setImagesSelected}
             />
-          <TouchableOpacity onPress={() => deleteHandler(key)}>
-            <Text
-              style={{
-                color: "red",
-                textAlign: "center",
-                fontSize: 13,
-                marginBottom: 10,
-              }}
-            >
-              Borrar producto del catalogo
-            </Text>
-          </TouchableOpacity>
         </View>
       ))}
-      <Icon
-        type="material-community"
-        name="plus"
-        color="rgba(111, 202, 186, 1)"
-        reverse
-        containerStyle={styles.btnContainer}
-        onPress={addHandler}
-      />
+
       <View>
                 <Checkbox.Item label="Declaro que los bienes a subastar son de mi pertenencia y no poseo ningun impedimento para subastarlos"
                 status={checked ? 'checked' : 'unchecked'}

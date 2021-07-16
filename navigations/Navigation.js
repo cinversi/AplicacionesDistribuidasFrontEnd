@@ -54,7 +54,7 @@ export default function Navigation() {
                 <Tab.Screen
                     name="mis-subastas"
                     component={MisSubastasStack}
-                    options={{ title: "Mis Subastas" }}
+                    options={{ title: "Mis Productos" }}
                 />
                 <Tab.Screen
                     name="account"

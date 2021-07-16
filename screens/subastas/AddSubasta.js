@@ -17,7 +17,7 @@ export default function AddSubasta({ navigation }) {
                 setLoading={setLoading}
                 navigation={navigation}
             />
-            <Loading isVisible={loading} text="Creando subasta..."/>
+            <Loading isVisible={loading} text="Cargando producto..."/>
             <Toast ref={toastRef} position="center" opacity={0.9}/>
         </KeyboardAwareScrollView>
     )

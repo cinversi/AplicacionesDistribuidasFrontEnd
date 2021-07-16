@@ -15,7 +15,6 @@ export default function Subastas({ navigation }) {
     const [user, setUser] = useState(null)
     const [subastas, setSubastas] = useState([])
     const [loading, setLoading] = useState(false)
-    const [usuario, setUsuario] = useState()
     const [currentUser, setcurrentUser] = useState(false)
 
     useFocusEffect(

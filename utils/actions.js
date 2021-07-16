@@ -60,7 +60,9 @@ export const uploadImage = async(image, path, name) => {
     const result = { statusResponse: false, error: null, url: null }
     const ref = firebase.storage().ref(path).child(name)
     const blob = await fileToBlob(image)
-
+    console.log("asi viene la imagen",image)
+    console.log("asi viene el path",path)
+    console.log("asi viene el nombre",image)
     try {
         await ref.put(blob)
         const url = await firebase.storage().ref(`${path}/${name}`).getDownloadURL()
@@ -123,16 +125,9 @@ export const addDocumentWithoutId = async(collection, data) => {
     const result = { statusResponse: true, error: null }
     try {
         await db.collection(collection).add(data)
-        console.log("esta es la data",data)
-        console.log("////////////////////////////////////////")
         for (let i=0; i<data.catalogo.length;i++){
             result[i]=(data.catalogo[i])
-            console.log("este es el data catalogo",data.catalogo[i])
-            console.log("////////////////////////////////////////")
-            console.log("este es el resultado",result[i])
-            console.log("////////////////////////////////////////")
-            console.log("esta es la descripcion",result[i].descripcion)
-            axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPRODUCTO + 
+            await axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPRODUCTO + 
                 `?&user_id=${data.rematador}
                 &descripcionCatalogo=${result[i].descripcion}
                 &descripcionCompleta=${result[i].descripcionCompleta}
@@ -144,181 +139,16 @@ export const addDocumentWithoutId = async(collection, data) => {
                 console.log(err)
               });
         }
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result     
-}
-
-export const getSubastas = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
+        for (let i=0; i<data.images.length;i++){
+            console.log("data IMAGENES",)
+                console.log("data.images[i]",data.images[i])
+                axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDFOTO + 
+                    `?&user_id=${data.rematador}
+                    &foto=${data.images[i]}`).then(res => {
+                }).catch(err => {
+                    console.log(err)
+                  });
         }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-
-export const getSubastasComun = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            .where("categoria","==","COMUN")
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-export const getSubastasEspecial = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            .where("categoria","in",["COMUN","ESPECIAL"])
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-export const getSubastasPlata = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            .where("categoria","in",["COMUN","ESPECIAL","PLATA"])
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-export const getSubastasOro = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            .where("categoria","in",["COMUN","ESPECIAL","PLATA","ORO"])
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-export const getSubastasPlatino = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            .where("categoria","in",["COMUN","ESPECIAL","PLATA","ORO","PLATINO"])
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
-}
-
-export const getMoreSubastas = async(limitSubastas, startSubasta) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "ACTIVA")
-            //.orderBy("createAt", "desc")
-            .startAfter(startSubasta.data().createAt)
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
     } catch (error) {
         result.statusResponse = false
         result.error = error
@@ -509,121 +339,6 @@ export const getMoreItemsCatalogo = async(limitSubastas, startSubasta) => {
         const response = await db
             .collection("subastas")
             .orderBy("createAt", "desc")
-            .startAfter(startSubasta.data().createAt)
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result     
-}
-
-
-export const uploadImageCatalogo = async(image,path,name,uidcat) => {
-    const result = { statusResponse: false, error: null, url: null }
-    const ref = firebase.storage().ref(path).child(name).ref(catalogo).child(uidcat)
-    const blob = await fileToBlob(image)
-
-    try {
-        await ref.put(blob)
-        const url = await firebase.storage().ref(`${path}/${name}/${catalogo}/${uidcat}`).getDownloadURL()
-        result.statusResponse = true
-        result.url = url
-    } catch (error) {
-        result.error = error
-    }
-    return result
-}
-
-export const getMisSubastas = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("rematador", "==", getCurrentUser().uid)
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result     
-}
-
-export const getMoreMisSubastas = async(limitSubastas, startSubasta) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("rematador", "==", getCurrentUser().uid)
-            //.orderBy("createAt", "desc")
-            .startAfter(startSubasta.data().createAt)
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubasta = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastas.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result     
-}
-
-export const getMisSubastasAdmin = async(limitSubastas) => {
-    const result = { statusResponse: true, error: null, subastasAdmin: [], startSubastaAdmin: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "PENDIENTE")
-            //.orderBy("createAt", "desc")
-            .limit(limitSubastas)
-            .get()
-        if (response.docs.length > 0) {
-            result.startSubastaAdmin = response.docs[response.docs.length - 1]
-        }
-        response.forEach((doc) => {
-            const subasta = doc.data()
-            subasta.id = doc.id
-            result.subastasAdmin.push(subasta)
-        })
-    } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result     
-}
-
-export const getMoreMisSubastasAdmin = async(limitSubastas, startSubasta) => {
-    const result = { statusResponse: true, error: null, subastas: [], startSubasta: null }
-    try {
-        const response = await db
-            .collection("subastas")
-            .where("statusSubasta", "==", "PENDIENTE")
-            //.orderBy("createAt", "desc")
             .startAfter(startSubasta.data().createAt)
             .limit(limitSubastas)
             .get()
