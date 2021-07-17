@@ -19,13 +19,15 @@ import { getCurrentUser, getDocumentById, AceptarSubastaRematadorUpdate, Rechaza
 const widthScreen = Dimensions.get("window").width
 
 export default function miSubasta({ navigation, route }) {
-    const { id, descripcionCatalogo,allImages, subasta } = route.params
+    const { id, descripcionCatalogo,descripcionCompleta,allImages, subasta } = route.params
     const toastRef = useRef()
     const [activeSlide, setActiveSlide] = useState(0)
     const [userLogged, setUserLogged] = useState(false)
     const [currentUser, setCurrentUser] = useState(null)
     const [loading, setLoading] = useState(false)
     const [icproducto, setICProducto] = useState(false)
+    const [subastaProducto, setSubastaProducto] = useState(false)
+    
     const idItem = subasta.item.id
 
     firebase.auth().onAuthStateChanged(user => {
@@ -49,13 +51,27 @@ export default function miSubasta({ navigation, route }) {
             });
     },[loading])
 
+    useEffect(() => {
+        setLoading(false)
+        console.log("este es el id item",idItem)
+            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETSUBASTAPRODUCTO + `?&producto_id=${idItem}`).then(res => {
+                setSubastaProducto(res.data);
+                console.log("esta es la res data",res.data)
+                setLoading(false)
+            }).catch(err => {
+                console.log(err);
+                console.log("este es el error",err)
+            });
+    },[loading])  
+
+    console.log("esta es la subasta producto",subastaProducto)
     const AceptarSubastaRematador = async() => {
         
         setLoading(true)
         const responseAddMoreInfo = await AceptarSubastaRematadorUpdate(id)
         if (!responseAddMoreInfo) {
             setLoading(false)
-            toastRef.current.show("Error al aceptar la subasta", 3000)
+            toastRef.current.show("Error al aceptar el producto", 3000)
             return
         }
 
@@ -77,9 +93,9 @@ export default function miSubasta({ navigation, route }) {
         const response = await sendPushNotification(messageNotificaction)
 
         if (response){
-            Alert.alert("Se ha activado la subasta.")
+            Alert.alert("Se ha aprobado el producto.")
         }else{
-            Alert.alert("Ocurrió un problema al aceptar la subasta")
+            Alert.alert("Ocurrió un problema al aprobar el producto")
         }
         navigation.navigate("mis-subastas")
     } 
@@ -89,7 +105,7 @@ export default function miSubasta({ navigation, route }) {
         const responseRechazar= await RechazarSubastaRematadorUpdate(id)
         if (!responseRechazar) {
             setLoading(false)
-            toastRef.current.show("Error al rechazar la subasta", 3000)
+            toastRef.current.show("Error al rechazar el producto", 3000)
             return
         }
         setLoading(true)
@@ -103,16 +119,16 @@ export default function miSubasta({ navigation, route }) {
         const messageNotificaction = setNotificationMessage(
             resultToken.document.token,
             'App Subastas',
-            'La propuesta de subasta fue rechazada por el subastador',
+            'La propuesta fue rechazada por el subastador',
             {data:'Data de prueba'}
         )
 
         const response = await sendPushNotification(messageNotificaction)
 
         if (response){
-            Alert.alert("Se ha rechazado la subasta.")
+            Alert.alert("Se ha rechazado la propuesta.")
         }else{
-            Alert.alert("Ocurrió un problema al rechazar la subasta.")
+            Alert.alert("Ocurrió un problema al rechazar la propuesta.")
         }
         navigation.navigate("mis-subastas")
     }
@@ -128,10 +144,12 @@ export default function miSubasta({ navigation, route }) {
             />
             <TitleSubasta
                 descripcionCatalogo={descripcionCatalogo}
+                descripcionCompleta={descripcionCompleta}
                 categoria={subasta.categoria}
                 moneda={subasta.moneda}
                 fechaSubastar={subasta.fechaSubastar}
                 horaSubastar={subasta.horaSubastar}
+                subastaProducto={subastaProducto}
             />
             <ListItem
                 style={styles.containerListItem}
@@ -155,7 +173,7 @@ export default function miSubasta({ navigation, route }) {
                 subasta.item.disponible == 'aprobado' ? (
                     <View>
                         <Button
-                            title="Aceptar Condiciones y Subastar"
+                            title="Aceptar Condiciones"
                             onPress={AceptarSubastaRematador}
                             buttonStyle={styles.btnActivarSubasta}
                             icon={{
@@ -183,13 +201,13 @@ export default function miSubasta({ navigation, route }) {
     )
 }
 
-function TitleSubasta({ descripcionCatalogo, categoria, moneda, fechaSubastar, horaSubastar }) {
+function TitleSubasta({ descripcionCatalogo, descripcionCompleta, categoria,subastaProducto, moneda, fechaSubastar, horaSubastar }) {
     return (
         <View style={styles.viewSubastaTitle}>
             <View style={styles.viewSubastaContainer}>
                 <Text style={styles.nameSubasta}>{descripcionCatalogo}</Text>
             </View>
-            <Text style={styles.descriptionSubasta}>{descripcionCatalogo}</Text>
+            <Text style={styles.descriptionSubasta}>{descripcionCompleta}</Text>
             <Text style={styles.categoriaSubasta}>Categoría {categoria}</Text>
             <Text style={styles.monedaSubastaAprobada}>Moneda: ${moneda}</Text>
             <Text style={styles.infoSubastaAprobada}>Fecha: {fechaSubastar}</Text>

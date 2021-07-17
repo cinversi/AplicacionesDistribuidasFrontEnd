@@ -32,7 +32,7 @@ function Subasta({ subasta, navigation }) {
     const allImages = getAllImagesSubasta()
 
     const goSubasta = () => {
-        navigation.navigate("miSubasta", { id, descripcionCatalogo, allImages, subasta })
+        navigation.navigate("miSubasta", { id, descripcionCatalogo, descripcionCompleta, allImages, subasta })
     } 
 
     return (
@@ -48,7 +48,6 @@ function Subasta({ subasta, navigation }) {
                 </View>
                 <View>
                     <Text style={styles.subastaTitle}>{descripcionCatalogo}</Text>
-                    <Text style={styles.subastaInformation}>Descripción: {descripcionCompleta}</Text>
                     <Text style={styles.subastaInformation}>Fecha: {fecha}</Text>
                     <Text style={styles.subastaEstado}>Disponible: {disponible}</Text>
                 </View>

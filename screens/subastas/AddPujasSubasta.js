@@ -1,4 +1,4 @@
-import React, { useState, useRef} from 'react'
+import React, { useState, useRef,useEffect} from 'react'
 import { Alert,SafeAreaView,StyleSheet, Text, View,FlatList,TouchableOpacity } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 import Toast from 'react-native-easy-toast'
@@ -7,14 +7,20 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import Loading from '../../components/Loading'
 import { getCurrentUser, addNewPuja,asistiendoAPuja,getDocumentById } from '../../utils/actions'
+
+import axios from 'axios'
+import config from '../../config'
  
 export default function AddPujasSubasta({ navigation, route }) {
-    const { subasta,id,itemUuid,permitidoPujar,nombreItem,ultimoValorPujado,ultimoPujador,precioBaseItem,ultimoDiaHorarioPuja,subastaNoValida,espectadorRematador} = route.params
+    const { catItem,subasta,id,itemUuid,permitidoPujar,ultimoValorPujado,ultimoPujador,precioBaseItem,ultimoDiaHorarioPuja,subastaNoValida,espectadorRematador,currentUser,habilitadoItemCatalogo} = route.params
     const toastRef = useRef()
  
     const [puja,setPuja] = useState(null)
     const [errorPuja,setErrorPuja]=useState(null)
-    const [loading, setLoading] = useState(false) 
+    const [loading, setLoading] = useState(true) 
+    const [cliente,setCliente] = useState("")
+    const [mediosDePago,setMediosDePago]= useState([])
+    const [asistente,setAsistente]=useState("")
 
     function getParsedDate() {
         const oldDate = new Date();
@@ -27,95 +33,57 @@ export default function AddPujasSubasta({ navigation, route }) {
         const horario=day + "-" + month + "-" + year + " " + hour + ":" + minutes
         return horario
     }
-    
-    const addPuja = async() => {
+
+    useEffect(() => {
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETCLIENTE+ `?&user_id=${currentUser.uid}`).then(res => {
+            setCliente(res.data.id)
+            setLoading(false)
+        }).catch(err => {
+            console.log(err);
+        });
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETMEDIOSDEPAGO+ `?&cliente_id=${cliente}`).then(res2 => {
+            setMediosDePago(res2.data)
+            setLoading(false)
+        }).catch(err => {
+            console.log(err);
+        });
+    },[loading])
+
+
+    const addPuja = async () =>{
         if (!validForm()) {
             return
-        }
-        const horarioPuja = getParsedDate()
-        setLoading(true)
-        const usuarioActual = await getDocumentById("users",getCurrentUser().uid)
-        const longitudMediosPago = size(usuarioActual.document.medioPago)
-        console.log("usuarioSubasta",usuarioActual.document.estoyEnSubasta,id)
-        if(longitudMediosPago > 0){
-            if(usuarioActual.document.estoyEnSubasta=="0" ||usuarioActual.document.estoyEnSubasta==id){
-                console.log("No estoy en otra subasta")
-                const responseAddPuja = await addNewPuja(id,itemUuid,puja,getCurrentUser().uid,horarioPuja )
-                cambiarAsistenciaAPuja()
-                if (!responseAddPuja.statusResponse) {
-                    setLoading(false)
-                    toastRef.current.show("Error al realizar puja", 3000)
-                    return
+        } 
+        const uidUser=currentUser.uid
+        const subastaId=subasta.item.id
+        const itemId=catItem.item.id
+        if(size(mediosDePago)>0){
+            await axios.get(config.API_URL+config.REACT_APP_BACKEND_ADDASISTENTE+ `?&user_id=${uidUser}&subasta_id=${subastaId}&item_id=${itemId}&importe=${puja}&comision=${"3"}`).then(res3 => {
+                if(res3.data=="EnOtraSubasta"){
+                    AlertaParticipandoEnOtraSubasta()
                 }
-                toastRef.current.show("Su puja fue realizada", 3000)
-                navigation.navigate("subastas") 
-            }
-            else{
-                console.log("Estoy en otra subasta")
+                else {
+                    AlertaExitoAlPujar()
+                }                
                 setLoading(false)
-                //Alert.alert("Confirmación", "Se le ha enviado un email con las instrucciones para generar su contraseña.",)
-                AlertaParticipandoEnOtraSubasta()            
-                navigation.navigate("subastas") 
-            }
-        }        
+            }).catch(err => {
+                console.log(err);
+            });              
+        }
         else{
             setLoading(false)
-            //Alert.alert("Confirmación", "Se le ha enviado un email con las instrucciones para generar su contraseña.",)
             AlertaNoMediosDePago()            
-            navigation.navigate("account") 
         }
-        
-    }
-    const AlertaNoMediosDePago = () =>
-        Alert.alert(
-        "Fallo",
-        "No tenes medios de pago registrados",
-        [
-            {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
-            },
-            { text: "OK", onPress: () => navigation.navigate("account")  }
-        ]
-    );
 
-    const AlertaParticipandoEnOtraSubasta = () =>
-        Alert.alert(
-        "Fallo",
-        "Actualmente ya estas participando en otra subasta",
-        [
-            {
-            text: "Cancel",
-            onPress: () => console.log("Cancel Pressed"),
-            style: "cancel"
-            },
-            { text: "OK", onPress: () => navigation.navigate("account")  }
-        ]
-    );
-
-
-    const cambiarAsistenciaAPuja = async () =>{
-        setLoading(true)
-        const result = await asistiendoAPuja("users",getCurrentUser().uid,id,id,itemUuid,nombreItem) 
-        if (!result.statusResponse){
-            setLoading(false)
-            toastRef.current.show("Error al confirmar asistencia a la puja", 3000)
-            return
-        }
     }
 
- 
     const validForm = () => {
-        clearErrors()
         let isValid = true
         const pujaInt=parseInt(puja)
         const valorLimit=(parseInt(ultimoValorPujado))*1.20
         const ultimoValorPujadoInt=parseInt(ultimoValorPujado)
  
-        console.log("categoriaSubasta",subasta.categoria)
-        console.log("ultimovalorpujado",ultimoValorPujado)
-        if(subasta.categoria=="COMUN" || subasta.categoria == "ESPECIAL" || subasta.categoria== "PLATA"){
+        if(subasta.item.categoria=="COMUN" || subasta.item.categoria == "ESPECIAL" || subasta.item.categoria== "PLATA"){
             if(parseInt(puja)<parseInt(ultimoValorPujadoInt*1.01)){
                 setErrorPuja("Debes ingresar un monto mayor al 1% del precio base")
                 isValid=false
@@ -145,10 +113,73 @@ export default function AddPujasSubasta({ navigation, route }) {
         return isValid
     }
 
-    console.log("AddPujaspermitidoPujar",permitidoPujar)
- 
-    const clearErrors = () => {
-        setErrorPuja(null)
+    const AlertaNoMediosDePago = () =>
+        Alert.alert(
+        "Fallo",
+        "No tenes medios de pago registrados",
+        [
+            {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+            },
+            { text: "OK", onPress: () => navigation.navigate("account")  }
+        ]
+    );
+
+    const AlertaParticipandoEnOtraSubasta = () =>
+        Alert.alert(
+        "Fallo",
+        "Actualmente ya estas participando en otra subasta",
+        [
+            {
+            text: "Cancel",
+            onPress: () => console.log("Cancel Pressed"),
+            style: "cancel"
+            },
+            { text: "OK", onPress: () => navigation.navigate("subastas")  }
+        ]
+    );
+
+    const AlertaAbandonasteSubasta = () =>
+    Alert.alert(
+    "Exito",
+    "Abandonaste la subasta",
+    [
+        {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel"
+        },
+        { text: "OK", onPress: () => navigation.navigate("subastas")  }
+    ]
+);
+
+    const AlertaExitoAlPujar = () =>
+    Alert.alert(
+    "Exito",
+    "Realizaste una nueva puja en la subasta!",
+    [
+        {
+        text: "Cancel",
+        onPress: () => console.log("Cancel Pressed"),
+        style: "cancel"
+        },
+        { text: "OK", onPress: () => navigation.navigate("subastas")  }
+    ]
+);
+    
+
+    const abandonarSubasta = async () =>{
+        const uidUser=currentUser.uid
+        const subastaId=subasta.item.id
+        const itemId=catItem.item.id
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_ABANDONARSUBASTA+ `?&user_id=${uidUser}&subasta_id=${subastaId}`).then(res => {
+            AlertaAbandonasteSubasta()             
+            setLoading(false)
+            }).catch(err => {
+                console.log(err);
+            });              
     }
 
     return (
@@ -159,12 +190,12 @@ export default function AddPujasSubasta({ navigation, route }) {
                     <Text style={styles.viewPrecioBase}>${precioBaseItem}</Text>
                     <Text style={styles.viewPrecioActualText}>Precio actual</Text>
                     <Text style={styles.viewPrecioActual}>${ultimoValorPujado}</Text>
-                    <Text style={styles.viewInfo}>{nombreItem}</Text>
+                    <Text style={styles.viewInfo}>{catItem.item.producto.descripcionCatalogo}</Text>
                     <Text style={styles.viewUltimasPujas}>Día y horario de última puja: {ultimoDiaHorarioPuja}</Text>
                     <Text style={styles.viewUltimasPujas}>Ultimo pujador: {ultimoPujador}</Text>
                 </View>
                 {
-                    permitidoPujar ?
+                    permitidoPujar && habilitadoItemCatalogo ?
                 <View style={styles.formReview}>
                     <Input
                         placeholder="$ Ingresar valor a pujar"
@@ -177,6 +208,12 @@ export default function AddPujasSubasta({ navigation, route }) {
                         onPress={addPuja}
                         buttonStyle={styles.btn}
                         containerStyle={styles.btnContainer}
+                    />                    
+                <Button
+                        title="Abandonar subasta"
+                        onPress={abandonarSubasta}
+                        buttonStyle={styles.btn}
+                        containerStyle={styles.btnContainer}
                     />
                 </View>
                     : !permitidoPujar ? 
@@ -185,10 +222,15 @@ export default function AddPujasSubasta({ navigation, route }) {
                             Si ya realizaste una puja debes esperar a que otra persona realice una para volver a pujar, intenta más tarde.
                             </Text>         
                         </View>
+                    : !habilitadoItemCatalogo ?
+                        <View>
+                            <Text style={styles.viewNoPujarBigText}>
+                            El producto ya ha sido subastado. Muchas gracias.
+                            </Text>         
+                        </View>
                     : null      
                 }
                 <Toast ref={toastRef} position="center" opacity={0.9}/>
-                <Loading isVisible={loading} text="Enviando su puja..."/>
             </View>
         </KeyboardAwareScrollView>
     )

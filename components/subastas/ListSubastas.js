@@ -25,7 +25,7 @@ function Subasta({ subasta, navigation, handleLoadMore }) {
         var result=[]
         for (let j=0; j<subasta.item.items.length;j++){
             for (let i=0; i<subasta.item.items[j].producto.fotos.length;i++){
-                result[i]=(subasta.item.items[j].producto.fotos[i].foto)
+                result[j]=(subasta.item.items[j].producto.fotos[i].foto)
             }
         }
         return result
