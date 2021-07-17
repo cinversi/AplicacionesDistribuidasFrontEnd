@@ -56,23 +56,6 @@ export default function UserActivityInfo() {
   const cantidadParticipaciones = size(participacion)
   const cantidadGanadas = size(subastasGanadas)
 
-  
-  const data = [
-    {
-      name: "No Ganadas",
-      population: cantidadParticipaciones,
-      color: "rgba(131, 167, 234, 1)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
-    },
-    {
-      name: "Ganadas",
-      population: cantidadGanadas/cantidadParticipaciones,
-      color: "rgb(0, 0, 255)",
-      legendFontColor: "#7F7F7F",
-      legendFontSize: 15
-    }
-  ];
   return (
     <View>
     {
@@ -88,29 +71,6 @@ export default function UserActivityInfo() {
         <Text style={styles.styleMonto}>El monto total gastado en las subastas hasta el momento es: ${montoGastado}</Text>
         </View>
         <Text style={styles.styleTitle}>Relación entre las subastas en las que participaste con las que ganaste:</Text>
-        <PieChart
-          data={data}
-          width={screenWidth}
-          height={220}
-          chartConfig={{
-            backgroundColor: "#e26a00",
-            backgroundGradientFrom: "#fb8c00",
-            backgroundGradientTo: "#ffa726",
-            decimalPlaces: 2, // optional, defaults to 2dp
-            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-            style: {
-              borderRadius: 16
-            },
-            propsForDots: {
-              r: "6",
-              strokeWidth: "2",
-              stroke: "#ffa726"
-            }
-          }}
-          accessor={"population"}
-          backgroundColor={"transparent"}
-        />
     </View>
    : null
   }

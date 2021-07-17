@@ -34,48 +34,6 @@ export const fileToBlob = async(path) => {
     return blob
 }
 
-export const getCurrentLocation = async() => {
-    const response = { status: false, location: null }
-    const resultPermissions = await Permissions.askAsync(Permissions.LOCATION)
-    if (resultPermissions.status === "denied") {
-        Alert.alert("Debes otorgar permisos para la localización.")
-        return response
-    }
-    const position = await Location.getCurrentPositionAsync({})
-    const location = {
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude,
-        latitudeDelta: 0.001,
-        longitudeDelta: 0.001
-    }
-    response.status = true
-    response.location = location
-    return response
-}
-
-export const formatPhone = (callingCode, phone) => {
-    if (size(phone) < 10)
-    {
-        return `+(${callingCode}) ${phone}`
-    }
-    return `+(${callingCode}) ${phone.substr(0, 3)} ${phone.substr(3, 3)} ${phone.substr(6, 4)}`
-}
-
-export const callNumber = (phoneNumber) => {
-    Linking.openURL(`tel:${phoneNumber}`)
-}
-
-export const sendWhatsApp = (phoneNumber, text) => {
-    const link = `https://wa.me/${phoneNumber}?text=${text}`
-    Linking.canOpenURL(link).then((supported) => {
-        if (!supported) {
-            Alert.alert("Por favor instale WhatsApp para enviar un mensaje directo")
-            return
-        }
-        return Linking.openURL(link)
-    })
-}
-
 export const sendEmail = (to, subject, body) => {
     Linking.openURL(`mailto:${to}?subject=${subject}&body=${body}`)
 }   

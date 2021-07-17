@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "6624894928",
-    "project_id": "subastas-2f2a6",
-    "storage_bucket": "subastas-2f2a6.appspot.com"
+    "project_number": "516624013392",
+    "project_id": "subastas-3eae1",
+    "storage_bucket": "subastas-3eae1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:6624894928:android:e2cad3ae81f9024780a3d5",
+        "mobilesdk_app_id": "1:516624013392:android:1b8f09596a111e23a65955",
         "android_client_info": {
           "package_name": "com.cinversi.subastas"
         }
       },
       "oauth_client": [
         {
-          "client_id": "6624894928-2pr5cpbhb7m8p7hb2orhn5sgqp4tsco7.apps.googleusercontent.com",
+          "client_id": "516624013392-vj38u9su5bbr1u6amh3kdjlpldu1mf60.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBs70sa1HW1deqAWZuvBq5kWkq0ReFkMuQ"
+          "current_key": "AIzaSyC0AI9nAPAA17-3AFo5SOvUGDitJ1YeKPY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "6624894928-2pr5cpbhb7m8p7hb2orhn5sgqp4tsco7.apps.googleusercontent.com",
+              "client_id": "516624013392-vj38u9su5bbr1u6amh3kdjlpldu1mf60.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
