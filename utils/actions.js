@@ -142,9 +142,11 @@ export const addDocumentWithoutId = async(collection, data) => {
         for (let i=0; i<data.images.length;i++){
             console.log("data IMAGENES",)
                 console.log("data.images[i]",data.images[i])
+                const foto = (data.images[i]).replace("&token", "%26token")
+                console.log("asi llega foto",foto)
                 axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDFOTO + 
                     `?&user_id=${data.rematador}
-                    &foto=${data.images[i]}`).then(res => {
+                    &foto=${foto}`).then(res => {
                 }).catch(err => {
                     console.log(err)
                   });
@@ -503,21 +505,7 @@ export const updatePujadorSubasta = async(collection, id, estado) => {
 
 export const doRegisterPersona = async(usuario) => {
     const nombre = usuario.nombre + ' ' + usuario.apellido
-    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPERSONA + `?&nombre=${nombre}&documento=${usuario.dni}&direccion=${usuario.direccion}`).then(res => {
-    }).catch(err => {
-      });
-    return
-}
-
-export const doRegisterUser = async(usuario) => {
-    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDUSER + `?&email=${usuario.email}&user_id=${usuario.id}`).then(res => {
-    }).catch(err => {
-      });
-    return
-}
-
-export const doRegisterCliente = async(usuario) => {
-    axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDCLIENTE + `?&categoria=${usuario.categoria}`).then(res => {
+    await axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPERSONA + `?&nombre=${nombre}&documento=${usuario.dni}&direccion=${usuario.direccion}&email=${usuario.email}&user_id=${usuario.id}&categoria=${usuario.categoria}`).then(res => {
     }).catch(err => {
       });
     return

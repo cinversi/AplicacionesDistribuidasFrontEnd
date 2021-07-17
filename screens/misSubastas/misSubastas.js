@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
-import { useFocusEffect } from '@react-navigation/native'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { Icon } from 'react-native-elements'
 import { size } from 'lodash'
@@ -16,7 +15,7 @@ import { getCurrentUser } from '../../utils/actions'
 export default function misSubastas({ navigation }) {
     const [user, setUser] = useState(null)
     const [subastas, setSubastas] = useState([])
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const [currentUser, setcurrentUser] = useState(false)
 
     useEffect(() => {

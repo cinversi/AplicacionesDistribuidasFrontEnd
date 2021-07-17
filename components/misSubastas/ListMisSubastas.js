@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ActivityIndicator, FlatList, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import { Image } from 'react-native-elements'
-import { set } from 'lodash'
 
 export default function ListMisSubastas({ subastas, navigation }) {
     return (
@@ -21,28 +20,37 @@ export default function ListMisSubastas({ subastas, navigation }) {
 function Subasta({ subasta, navigation }) {
     const { id, images, artista_obra,cantidad,descripcionCatalogo,descripcionCompleta,
         disponible,duenio_id,fecha,fecha_obra,historia_obra} = subasta.item
-    //const imageSubasta = images[0]
+    const imageSubasta = subasta.item.fotos[0].foto
+    
+    const getAllImagesSubasta =()=> {
+        var result=[]
+        for (let i=0; i<subasta.item.fotos.length;i++){
+            result[i]=(subasta.item.fotos[i].foto)
+        }
+        return result
+    }
+    const allImages = getAllImagesSubasta()
 
     const goSubasta = () => {
-        navigation.navigate("miSubasta", { id, descripcionCatalogo })
+        navigation.navigate("miSubasta", { id, descripcionCatalogo, allImages, subasta })
     } 
 
     return (
         <TouchableOpacity onPress={goSubasta}>
             <View style={styles.viewSubasta}>
                 <View style={styles.viewSubastaImage}>
-                    {/* <Image
+                    <Image
                         resizeMode="cover"
                         PlaceholderContent={<ActivityIndicator color="#fff"/>}
                         source={{ uri: imageSubasta }}
                         style={styles.imageSubasta}
-                    /> */}
+                    />
                 </View>
                 <View>
                     <Text style={styles.subastaTitle}>{descripcionCatalogo}</Text>
                     <Text style={styles.subastaInformation}>Descripción: {descripcionCompleta}</Text>
                     <Text style={styles.subastaInformation}>Fecha: {fecha}</Text>
-                    <Text style={styles.subastaEstado}>Estado: {disponible}</Text>
+                    <Text style={styles.subastaEstado}>Disponible: {disponible}</Text>
                 </View>
             </View>
         </TouchableOpacity>

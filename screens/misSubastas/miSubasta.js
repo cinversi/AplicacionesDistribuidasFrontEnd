@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { View } from 'react-native'
 import { Alert, Dimensions, StyleSheet, Text, ScrollView } from 'react-native'
 import { ListItem, Button } from 'react-native-elements'
@@ -11,46 +11,45 @@ import CarouselImages from '../../components/CarouselImages'
 import Loading from '../../components/Loading'
 import ListItemsMiSubasta from '../../components/subastas/ListItemsMiSubasta'
 
+import config from'../../config';
+import axios from 'axios'
+
 import { getCurrentUser, getDocumentById, AceptarSubastaRematadorUpdate, RechazarSubastaRematadorUpdate, setNotificationMessage, sendPushNotification } from '../../utils/actions'
 
 const widthScreen = Dimensions.get("window").width
 
 export default function miSubasta({ navigation, route }) {
-    const { id, name } = route.params
+    const { id, descripcionCatalogo,allImages, subasta } = route.params
     const toastRef = useRef()
-    
-    const [subasta, setSubasta] = useState(null)
     const [activeSlide, setActiveSlide] = useState(0)
     const [userLogged, setUserLogged] = useState(false)
     const [currentUser, setCurrentUser] = useState(null)
     const [loading, setLoading] = useState(false)
-    const [catItems, setCatItems] = useState([])
+    const [icproducto, setICProducto] = useState(false)
+    const idItem = subasta.item.id
 
     firebase.auth().onAuthStateChanged(user => {
         user ? setUserLogged(true) : setUserLogged(false)
         setCurrentUser(user)
     })
 
-    navigation.setOptions({ title: name })
-
-    useFocusEffect(
-        useCallback(() => {
-            (async() => {
-                const response = await getDocumentById("subastas", id)
-                if (response.statusResponse) {
-                    setSubasta(response.document)
-                    setCatItems(response.document.catalogo)
-                } else {
-                    setSubasta({})
-                    Alert.alert("Ocurrió un problema cargando la subasta, intente más tarde.")
-                }
-            })()
-        }, [])
-    )
+    navigation.setOptions({ title: descripcionCatalogo})
 
     if (!subasta) {
         return <Loading isVisible={true} text="Cargando..."/>
     }
+
+    useEffect(() => {
+        setLoading(false)
+            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETITEMSCATALOGOPRODUCTO + `?&producto_id=${idItem}`).then(res => {
+                setICProducto(res.data);
+                setLoading(false)
+            }).catch(err => {
+                console.log(err);
+            });
+    },[loading])
+
+    console.log("este es el item del producto",icproducto)
 
     const AceptarSubastaRematador = async() => {
         
@@ -73,7 +72,7 @@ export default function miSubasta({ navigation, route }) {
         const messageNotificaction = setNotificationMessage(
             resultToken.document.token,
             'App Subastas',
-            'El usuario ha aceptado los terminos y activo la subasta',
+            'El usuario ha aceptado los terminos y activo el producto',
             {data:'Data de prueba'}
         )
 
@@ -125,15 +124,14 @@ export default function miSubasta({ navigation, route }) {
     return (
         <ScrollView style={styles.viewBody}>
             <CarouselImages
-                images={subasta.images}
+                images={allImages}
                 height={250}
                 width={widthScreen}
                 activeSlide={activeSlide}
                 setActiveSlide={setActiveSlide}
             />
             <TitleSubasta
-                name={subasta.name}
-                description={subasta.description}
+                descripcionCatalogo={descripcionCatalogo}
                 categoria={subasta.categoria}
                 moneda={subasta.moneda}
                 fechaSubastar={subasta.fechaSubastar}
@@ -144,12 +142,12 @@ export default function miSubasta({ navigation, route }) {
             ></ListItem>
             <Text style={styles.catalogoTitle}>Catálogo</Text>
             {
-                size(catItems) > 0 ? (
+                size(subasta) > 0 ? (
                     <ListItemsMiSubasta
-                        catItems={catItems}
+                        catItems={subasta}
+                        icproducto={icproducto}
                         navigation={navigation}
                         handleLoadMore={() => {}}
-                        subasta={subasta}
                     />
                 ) : (
                     <View style={styles.notFoundView}>
@@ -189,13 +187,13 @@ export default function miSubasta({ navigation, route }) {
     )
 }
 
-function TitleSubasta({ name, description, categoria, moneda, fechaSubastar, horaSubastar }) {
+function TitleSubasta({ descripcionCatalogo, categoria, moneda, fechaSubastar, horaSubastar }) {
     return (
         <View style={styles.viewSubastaTitle}>
             <View style={styles.viewSubastaContainer}>
-                <Text style={styles.nameSubasta}>{name}</Text>
+                <Text style={styles.nameSubasta}>{descripcionCatalogo}</Text>
             </View>
-            <Text style={styles.descriptionSubasta}>{description}</Text>
+            <Text style={styles.descriptionSubasta}>{descripcionCatalogo}</Text>
             <Text style={styles.categoriaSubasta}>Categoría {categoria}</Text>
             <Text style={styles.monedaSubastaAprobada}>Moneda: ${moneda}</Text>
             <Text style={styles.infoSubastaAprobada}>Fecha: {fechaSubastar}</Text>

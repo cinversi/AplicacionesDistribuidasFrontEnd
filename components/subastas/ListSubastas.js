@@ -32,19 +32,6 @@ function Subasta({ subasta, navigation, handleLoadMore }) {
     }
     const allImages = getAllImagesSubasta()
 
-    // const getDescripcionProducto =()=> {
-
-    //     var descripcionCatalogo=[]
-    //     var descripcionCompleta=[]
-    //     //var final=
-    //     for (let i=0; i<subasta.item.items.length;i++){
-    //         descripcionCatalogo[i]=subasta.item.items[i].producto.descripcionCatalogo
-    //         descripcionCompleta[i]=subasta.item.items[i].producto.descripcionCompleta
-    //     }
-    //     return
-    // }
-    // const allDescripcion = getDescripcionProducto()
-
     const goSubasta = () => {
         navigation.navigate("subasta", { id, descripcion,moneda, allImages, subasta })
     } 

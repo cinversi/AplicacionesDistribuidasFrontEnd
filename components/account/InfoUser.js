@@ -2,7 +2,7 @@ import React, { useState,useCallback } from 'react'
 import { Alert, StyleSheet, Text, View } from 'react-native'
 import { Avatar } from 'react-native-elements'
 import { useFocusEffect } from '@react-navigation/native'
-import { doRegisterPersona,doRegisterUser, doRegisterCliente,getDocumentById, updateProfile, uploadImage } from '../../utils/actions'
+import { doRegisterPersona,getDocumentById, updateProfile, uploadImage } from '../../utils/actions'
 import { loadImageFromGallery } from '../../utils/helpers'
 import Loading from '../../components/Loading'
 

@@ -11,8 +11,6 @@ import CarouselImages from '../../components/CarouselImages'
 import Loading from '../../components/Loading'
 import ListItems from '../../components/subastas/ListItems'
 
-import { getDocumentById } from '../../utils/actions'
-
 const widthScreen = Dimensions.get("window").width
 
 export default function Subasta({ navigation, route }) {

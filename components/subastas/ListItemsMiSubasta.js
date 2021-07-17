@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { FlatList, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
 import firebase from 'firebase/app'
 import {size} from 'lodash'
-export default function ListItemsMiSubasta({ catItems, id, navigation, handleLoadMore, subasta}) {
+export default function ListItemsMiSubasta({ catItems, id, icproducto, navigation, handleLoadMore, subasta}) {
+    console.log("asi llego icproducto ",icproducto)
 
     return (
         <View>
@@ -14,6 +15,7 @@ export default function ListItemsMiSubasta({ catItems, id, navigation, handleLoa
                 renderItem={(catItem) => (
                     <CatItem 
                         catItem={catItem} 
+                        icproducto={icproducto}
                         id={id}
                         navigation={navigation}
                         subasta={subasta}/>
@@ -23,46 +25,21 @@ export default function ListItemsMiSubasta({ catItems, id, navigation, handleLoa
     )
 }
 
-function CatItem({ catItem, navigation, subasta}) {
+function CatItem({ catItem, icproducto, navigation, subasta}) {
     const [userLogged, setUserLogged] = useState(false)
     const { itemUuid, nombreItem, descripcion, cantidad } = catItem.item
-    const [precioBaseItem,setPrecioBaseItem] = useState()
-    const [comisionBaseItem,setComisionBaseItem] = useState()
-
+    const precioBaseItem = icproducto.precioBase
+    const comisionBaseItem = icproducto.comision
     const goCatItem = () => {
         navigation.navigate("catItem", { itemUuid, nombreItem })
     } 
+    console.log("asi llego icproducto ADENTRO DE CATIEM",icproducto)
+
     
     firebase.auth().onAuthStateChanged((user) => {
         user ? setUserLogged(true) : setUserLogged(false)
     })
-
-    useEffect(() => {
-        setPrecioBaseItem(ObtenerPrecioBaseItem(subasta,itemUuid))
-        setComisionBaseItem(ObtenerComisionBaseItem(subasta,itemUuid))
-        console.log(precioBaseItem)
-    }, [])
     
-    const ObtenerPrecioBaseItem = (subasta,itemUuid) => {
-        const longitudPrecios=size(subasta.preciosBase)
-        let precioBaseProd = ""
-        for(let i = 0; i < longitudPrecios; i++){
-            if(subasta.preciosBase[i].itemUuid==itemUuid){
-                precioBaseProd =subasta.preciosBase[i].precioBase
-            }
-        }
-        return precioBaseProd
-    }
-    const ObtenerComisionBaseItem = (subasta,itemUuid) => {
-        const longitudPrecios=size(subasta.preciosBase)
-        let comisionBaseProd = ""
-        for(let i = 0; i < longitudPrecios; i++){
-            if(subasta.preciosBase[i].itemUuid==itemUuid){
-                comisionBaseProd=parseFloat(parseInt(subasta.preciosBase[i].precioBase)*0.1).toFixed(2)
-            }
-        }
-        return comisionBaseProd
-    }
  
     return (
         <TouchableOpacity onPress={goCatItem}>
