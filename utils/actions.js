@@ -429,26 +429,18 @@ export const cerrandoSubasta = async(collection, id, estado,lastPujador) => {
     return result     
 }
 
-export const AceptarSubastaRematadorUpdate = async(idSubasta) => {
-    const result = { statusResponse: true, error: null }
-    try {
-        db.collection("subastas").doc(idSubasta).update({statusSubasta:"ACTIVA"})
-     } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result   
+export const AceptarSubastaRematadorUpdate = async(id) => {
+    await axios.get(config.API_URL + config.REACT_APP_BACKEND_ACEPTARPRODUCTO + `?id=${id}`).then(res => {
+    }).catch(err => {
+      });
+    return true
 }
 
-export const RechazarSubastaRematadorUpdate = async(idSubasta) => {
-    const result = { statusResponse: true, error: null }
-    try {
-        db.collection("subastas").doc(idSubasta).update({statusSubasta:"RECHAZADA"})
-     } catch (error) {
-        result.statusResponse = false
-        result.error = error
-    }
-    return result
+export const RechazarSubastaRematadorUpdate = async(id) => {
+    await axios.get(config.API_URL + config.REACT_APP_BACKEND_RECHAZARPRODUCTO + `?id=${id}`).then(res => {
+    }).catch(err => {
+      });
+    return true
 }
 
 export const reseteandoPujadores = async(collection, idUsuario, estado) => {

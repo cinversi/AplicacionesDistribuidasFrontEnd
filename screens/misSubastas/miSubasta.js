@@ -49,13 +49,11 @@ export default function miSubasta({ navigation, route }) {
             });
     },[loading])
 
-    console.log("este es el item del producto",icproducto)
-
     const AceptarSubastaRematador = async() => {
         
         setLoading(true)
         const responseAddMoreInfo = await AceptarSubastaRematadorUpdate(id)
-        if (!responseAddMoreInfo.statusResponse) {
+        if (!responseAddMoreInfo) {
             setLoading(false)
             toastRef.current.show("Error al aceptar la subasta", 3000)
             return
@@ -87,11 +85,9 @@ export default function miSubasta({ navigation, route }) {
     } 
 
     const RechazarSubastaRematador = async() => {
-        console.log("entra")
-        console.log(id)
         setLoading(true)
         const responseRechazar= await RechazarSubastaRematadorUpdate(id)
-        if (!responseRechazar.statusResponse) {
+        if (!responseRechazar) {
             setLoading(false)
             toastRef.current.show("Error al rechazar la subasta", 3000)
             return
@@ -156,7 +152,7 @@ export default function miSubasta({ navigation, route }) {
                 )
             }
             {
-                subasta.statusSubasta == 'APROBADA' ? (
+                subasta.item.disponible == 'aprobado' ? (
                     <View>
                         <Button
                             title="Aceptar Condiciones y Subastar"

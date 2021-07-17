@@ -1,63 +1,29 @@
-import React, { useState, useEffect } from 'react'
-import { FlatList, StyleSheet, Text, View, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import firebase from 'firebase/app'
-import {size} from 'lodash'
-export default function ListItemsMiSubasta({ catItems, id, icproducto, navigation, handleLoadMore, subasta}) {
-    console.log("asi llego icproducto ",icproducto)
 
-    return (
-        <View>
-            <FlatList
-                data={catItems}
-                keyExtractor={(item, index) => index.toString()}
-                onEndReachedThreshold={0.5}
-                onEndReached={handleLoadMore}
-                renderItem={(catItem) => (
-                    <CatItem 
-                        catItem={catItem} 
-                        icproducto={icproducto}
-                        id={id}
-                        navigation={navigation}
-                        subasta={subasta}/>
-                )}
-            />
-        </View>
-    )
-}
-
-function CatItem({ catItem, icproducto, navigation, subasta}) {
+export default function ListItemsMiSubasta({ catItems, icproducto }) {
     const [userLogged, setUserLogged] = useState(false)
-    const { itemUuid, nombreItem, descripcion, cantidad } = catItem.item
-    const precioBaseItem = icproducto.precioBase
-    const comisionBaseItem = icproducto.comision
-    const goCatItem = () => {
-        navigation.navigate("catItem", { itemUuid, nombreItem })
-    } 
-    console.log("asi llego icproducto ADENTRO DE CATIEM",icproducto)
 
-    
     firebase.auth().onAuthStateChanged((user) => {
         user ? setUserLogged(true) : setUserLogged(false)
     })
-    
- 
+
     return (
-        <TouchableOpacity onPress={goCatItem}>
-            <View style={styles.viewCatitem}>
-                <View>
-                    <Text style={styles.catitemTitle}>Producto: {nombreItem}</Text>
-                    <Text style={styles.catitemInformation}>Descripción: {descripcion}</Text>
-                    <Text style={styles.catitemInformation}>Cantidad: {cantidad}</Text>
-                    <Text style={styles.catitemTitle}>Precio Base: ${precioBaseItem}</Text>
-                    <Text style={styles.catitemTitle}>Comision Base: ${comisionBaseItem} (*)</Text>
-                    <Text style={styles.catitemInformation}>(*) La comisión final será calculada siendo el 10% del precio final del producto.</Text>
-                    <Text style={styles.catitemRecordatorio}>Recordatorio: En caso de rechazar la oferta se llevará a cabo la devolución del bien y se le cobrarán los gastos de devolución.</Text>
-                </View>
+        <View style={styles.viewCatitem}>
+            <View>
+                <Text style={styles.catitemTitle}>Producto: {catItems.item.descripcionCatalogo}</Text>
+                <Text style={styles.catitemInformation}>Descripción: {catItems.item.descripcionCompleta}</Text>
+                <Text style={styles.catitemInformation}>Cantidad: {catItems.item.cantidad}</Text>
+                <Text style={styles.catitemTitle}>Precio Base: ${icproducto.precioBase}</Text>
+                <Text style={styles.catitemTitle}>Comision Base: %{icproducto.comision} (*)</Text>
+                <Text style={styles.catitemInformation}>(*) La comisión final será calculada siendo el 10% del precio final del producto.</Text>
+                <Text style={styles.catitemRecordatorio}>Recordatorio: En caso de rechazar la oferta se llevará a cabo la devolución del bien y se le cobrarán los gastos de devolución.</Text>
             </View>
-        </TouchableOpacity>
+        </View>
     )
 }
-
+    
 const styles = StyleSheet.create({
     viewCatitem: {
         flexDirection: "row",
