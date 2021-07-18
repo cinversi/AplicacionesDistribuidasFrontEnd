@@ -27,8 +27,8 @@ export default function miSubasta({ navigation, route }) {
     const [loading, setLoading] = useState(false)
     const [icproducto, setICProducto] = useState(false)
     const [subastaProducto, setSubastaProducto] = useState(false)
-    
     const idItem = subasta.item.id
+    const itemDisponible = subasta.item.disponible
 
     firebase.auth().onAuthStateChanged(user => {
         user ? setUserLogged(true) : setUserLogged(false)
@@ -53,17 +53,14 @@ export default function miSubasta({ navigation, route }) {
 
     useEffect(() => {
         setLoading(false)
-            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETSUBASTAPRODUCTO + `?&producto_id=${idItem}`).then(res => {
+            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETSUBASTAPRODUCTO + `?&id=${idItem}`).then(res => {
                 setSubastaProducto(res.data);
-                console.log("esta es la res data",res.data)
                 setLoading(false)
             }).catch(err => {
                 console.log(err);
-                console.log("este es el error",err)
             });
     },[loading])  
 
-    console.log("esta es la subasta producto",subastaProducto)
     const AceptarSubastaRematador = async() => {
         
         setLoading(true)
@@ -144,11 +141,8 @@ export default function miSubasta({ navigation, route }) {
             <TitleSubasta
                 descripcionCatalogo={descripcionCatalogo}
                 descripcionCompleta={descripcionCompleta}
-                categoria={subasta.categoria}
-                moneda={subasta.moneda}
-                fechaSubastar={subasta.fechaSubastar}
-                horaSubastar={subasta.horaSubastar}
                 subastaProducto={subastaProducto}
+                itemDisponible={itemDisponible}
             />
             <ListItem
                 style={styles.containerListItem}
@@ -200,18 +194,22 @@ export default function miSubasta({ navigation, route }) {
     )
 }
 
-function TitleSubasta({ descripcionCatalogo, descripcionCompleta, categoria,subastaProducto, moneda, fechaSubastar, horaSubastar }) {
+function TitleSubasta({ descripcionCatalogo, descripcionCompleta, subastaProducto, itemDisponible}) {
     return (
         <View style={styles.viewSubastaTitle}>
             <View style={styles.viewSubastaContainer}>
                 <Text style={styles.nameSubasta}>{descripcionCatalogo}</Text>
             </View>
             <Text style={styles.descriptionSubasta}>{descripcionCompleta}</Text>
-            <Text style={styles.categoriaSubasta}>Categoría {categoria}</Text>
-            <Text style={styles.monedaSubastaAprobada}>Moneda: ${moneda}</Text>
-            <Text style={styles.infoSubastaAprobada}>Fecha: {fechaSubastar}</Text>
-            <Text style={styles.infoSubastaAprobada}>Hora: {horaSubastar}hs</Text>
-
+            { itemDisponible=="si" ?
+            <View>
+            <Text style={styles.categoriaSubasta}>Categoría {subastaProducto.categoria}</Text>
+            <Text style={styles.monedaSubastaAprobada}>Moneda: ${subastaProducto.moneda}</Text>
+            <Text style={styles.infoSubastaAprobada}>Fecha: {subastaProducto.fecha}</Text>
+            <Text style={styles.infoSubastaAprobada}>Hora: {subastaProducto.horaInicio}hs</Text>
+            </View>
+            : null
+            }
         </View>
     )
 }

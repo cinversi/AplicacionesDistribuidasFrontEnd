@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ListItem, Icon } from 'react-native-elements'
 import { map } from 'lodash';
 import Toast from 'react-native-easy-toast'
@@ -7,7 +7,6 @@ import { getCurrentUser } from '../../utils/actions'
 import { useNavigation } from '@react-navigation/native'
 
 import Modal from '../Modal';
-import ChangeDisplayNameForm from '../../components/account/ChangeDisplayNameForm';
 import ChangeEmailForm from '../../components/account/ChangeEmailForm';
 import ChangePasswordForm from '../../components/account/ChangePasswordForm';
 import ChangeDireccionForm from '../../components/account/ChangeDireccionForm';
@@ -30,14 +29,6 @@ export default function AccountOptions() {
 
     const generateOptions = () => {
         return [
-            {
-                title : "Cambiar Nombre y Apellido",
-                iconNameLeft: "account-circle",
-                iconColorLeft: "#a7bfd3",
-                iconNameRight: "chevron-right",
-                iconColorRight: "#a7bfd3",
-                onPress: () => selectedComponent("displayName")
-            },
             {
                 title : "Cambiar Email",
                 iconNameLeft: "at",
@@ -67,16 +58,6 @@ export default function AccountOptions() {
 
     const selectedComponent = (key) => {
         switch (key) {
-            case "displayName":
-                setRenderComponent(
-                    <ChangeDisplayNameForm
-                        displayName={user.displayName}
-                        setShowModal={setShowModal}
-                        toastRef={toastRef}
-                        setRelodUser={setReloadUser}
-                    />
-                )
-                break;
             case "email":
                 setRenderComponent(
                     <ChangeEmailForm

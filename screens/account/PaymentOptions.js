@@ -7,12 +7,13 @@ import firebase from 'firebase/app'
 
 import Loading from '../../components/Loading'
 import ListPaymentOptions from '../../components/account/ListPaymentOptions'
-import { getCurrentUser, getDocumentById } from '../../utils/actions'
+import { getCurrentUser } from '../../utils/actions'
 
+import axios from 'axios'
+import config from '../../config'
 
 export default function PaymentsOptions({ navigation }) {
     const [user, setUser] = useState(null)
-    const [startPayment, setStartPayment] = useState(null)
     const [payments, setPayments] = useState([])
     const [loading, setLoading] = useState(false)
 
@@ -27,9 +28,13 @@ export default function PaymentsOptions({ navigation }) {
             async function getData() {
                 setLoading(true)
                 const currentUser = getCurrentUser().uid;
-                const response = await getDocumentById("users", currentUser);
-                setPayments(response.document.medioPago)
-                setLoading(false)
+                axios.get(config.API_URL+config.REACT_APP_BACKEND_GETMEDIOSDEPAGO + `?user_id=${currentUser}`).then(res => {
+                    setPayments(res.data)
+                    setLoading(false)
+                  }).catch(err => {
+                      console.log(err);
+                  });
+                  setLoading(false)
             }
             getData()
         }, [])
@@ -50,7 +55,8 @@ export default function PaymentsOptions({ navigation }) {
                     />
                 ) : (
                     <View style={styles.notFoundView}>
-                        <Text style={styles.notFoundText}>No hay medios de pago registrados.</Text>
+                        <Text style={styles.notFoundText}>No hay medios de pago registrados</Text>
+                        <Text style={styles.notFoundText}>o aún no han sido verificados.</Text>
                     </View>
                 )
             }

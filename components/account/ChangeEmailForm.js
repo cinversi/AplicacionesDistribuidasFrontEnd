@@ -6,6 +6,9 @@ import { isEmpty } from 'lodash'
 import { reauthenticate, updateEmail } from '../../utils/actions'
 import { validateEmail } from '../../utils/helpers'
 
+import axios from 'axios'
+import config from '../../config'
+
 export default function ChangeEmailForm({ email, setShowModal, toastRef, setRelodUser }) {
     const [newEmail, setNewEmail] = useState(email)
     const [password, setPassword] = useState(null)
@@ -28,6 +31,9 @@ export default function ChangeEmailForm({ email, setShowModal, toastRef, setRelo
         }
 
         const resultUpdateEmail = await updateEmail(newEmail)
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_CHANGEEMAILUSER + `?user_id=${currentUser}&email=${newEmail}`).then(res => {
+          }).catch(err => {
+          });
         setLoading(false)
 
         if (!resultUpdateEmail.statusResponse) {

@@ -500,5 +500,4 @@ export const doRegisterPersona = async(usuario) => {
     await axios.get(config.API_URL + config.REACT_APP_BACKEND_ADDPERSONA + `?&nombre=${nombre}&documento=${usuario.dni}&direccion=${usuario.direccion}&email=${usuario.email}&user_id=${usuario.id}&categoria=${usuario.categoria}`).then(res => {
     }).catch(err => {
       });
-    return
 }

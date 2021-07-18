@@ -1,54 +1,32 @@
 import React, { useState, useRef,useEffect} from 'react'
-import { Alert,SafeAreaView,StyleSheet, Text, View,FlatList,TouchableOpacity } from 'react-native'
+import { Alert,StyleSheet, Text, View } from 'react-native'
 import { Button, Input } from 'react-native-elements'
 import Toast from 'react-native-easy-toast'
 import { isEmpty,size} from 'lodash'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import Loading from '../../components/Loading'
-import { getCurrentUser, addNewPuja,asistiendoAPuja,getDocumentById } from '../../utils/actions'
 
 import axios from 'axios'
 import config from '../../config'
  
 export default function AddPujasSubasta({ navigation, route }) {
-    const { catItem,subasta,id,itemUuid,permitidoPujar,ultimoValorPujado,ultimoPujador,precioBaseItem,ultimoDiaHorarioPuja,subastaNoValida,espectadorRematador,currentUser,habilitadoItemCatalogo} = route.params
+    const { catItem,subasta,permitidoPujar,ultimoValorPujado,ultimoPujador,precioBaseItem,ultimoDiaHorarioPuja,subastaNoValida,espectadorRematador,currentUser,habilitadoItemCatalogo} = route.params
     const toastRef = useRef()
  
     const [puja,setPuja] = useState(null)
     const [errorPuja,setErrorPuja]=useState(null)
     const [loading, setLoading] = useState(true) 
-    const [cliente,setCliente] = useState("")
     const [mediosDePago,setMediosDePago]= useState([])
-    const [asistente,setAsistente]=useState("")
-
-    function getParsedDate() {
-        const oldDate = new Date();
-        const day = oldDate.getDate();
-        const month = oldDate.getMonth() + 1;
-        const year = oldDate.getFullYear();
-        const hour = oldDate.getHours();
-        const minutes = oldDate.getUTCMinutes();
-
-        const horario=day + "-" + month + "-" + year + " " + hour + ":" + minutes
-        return horario
-    }
 
     useEffect(() => {
-        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETCLIENTE+ `?&user_id=${currentUser.uid}`).then(res => {
-            setCliente(res.data.id)
-            setLoading(false)
-        }).catch(err => {
-            console.log(err);
-        });
-        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETMEDIOSDEPAGO+ `?&cliente_id=${cliente}`).then(res2 => {
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETMEDIOSDEPAGO+ `?user_id=${currentUser.uid}`).then(res2 => {
             setMediosDePago(res2.data)
             setLoading(false)
         }).catch(err => {
             console.log(err);
         });
     },[loading])
-
 
     const addPuja = async () =>{
         if (!validForm()) {

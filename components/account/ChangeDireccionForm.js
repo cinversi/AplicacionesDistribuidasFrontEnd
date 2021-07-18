@@ -5,6 +5,9 @@ import { isEmpty } from 'lodash'
 
 import { updateDireccion } from '../../utils/actions'
 
+import axios from 'axios'
+import config from '../../config'
+
 export default function ChangeDireccionForm({ direccion, setShowModal, toastRef, setRelodUser}) {
     const [newDireccion, setNewDireccion] = useState(null)
     const [error, setError] = useState(null)
@@ -17,6 +20,9 @@ export default function ChangeDireccionForm({ direccion, setShowModal, toastRef,
 
         setLoading(true)
         const result = await updateDireccion(newDireccion)  
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_UPDATEDATOSPERSONA + `?user_id=${currentUser}&direccion=${newDireccion}`).then(res => {
+          }).catch(err => {
+          });
         setLoading(false)
 
         if (!result.statusResponse) {

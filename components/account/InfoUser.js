@@ -6,9 +6,13 @@ import { doRegisterPersona,getDocumentById, updateProfile, uploadImage } from '.
 import { loadImageFromGallery } from '../../utils/helpers'
 import Loading from '../../components/Loading'
 
+import axios from 'axios'
+import config from '../../config'
+
 export default function InfoUser({ user, setLoading, setLoadingText }) {
     const [photoUrl, setPhotoUrl] = useState(user.photoURL)
     const [usuario, setUsuario] = useState(null)
+    const [datosUsuario, setDatosUsuario] = useState(null)
     
     useFocusEffect(
         useCallback(() => {
@@ -16,6 +20,10 @@ export default function InfoUser({ user, setLoading, setLoadingText }) {
                 const response = await getDocumentById("users", user.uid)
                 setUsuario(response.document)
                 await doRegisterPersona(response.document)
+                axios.get(config.API_URL + config.REACT_APP_BACKEND_GETPERSONA + `?user_id=${user.uid}`).then(res => {
+                    setDatosUsuario(res.data)
+                }).catch(err => {
+                  });
             }
             getData()
         }, [])
@@ -59,6 +67,17 @@ export default function InfoUser({ user, setLoading, setLoadingText }) {
                         : require("../../assets/avatar-default.jpg")
                 }
             />
+            { datosUsuario ?
+            <View style={styles.infoUser}>
+                <Text style={styles.displayName}>
+                    {
+                        datosUsuario.nombre
+                    }
+                </Text>
+                <Text>{datosUsuario.email}</Text>
+                <Text>Categoria: {datosUsuario.categoria}</Text>
+            </View>
+            :
             <View style={styles.infoUser}>
                 <Text style={styles.displayName}>
                     {
@@ -68,6 +87,7 @@ export default function InfoUser({ user, setLoading, setLoadingText }) {
                 <Text>{usuario.email}</Text>
                 <Text>Categoria: {usuario.categoria}</Text>
             </View>
+            }
         </View>
     )
 }
