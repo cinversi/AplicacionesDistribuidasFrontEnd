@@ -55,6 +55,7 @@ function CatItem({ catItem,id,horaComienzoSubasta,horaFinSubasta,fechaSubasta,su
     const [users,setUsers]=useState([])
     const [loading, setLoading] = useState(true)
     const [habilitadoItemCatalogo,setHabilitadoItemCatalogo] = useState(true)
+    const [espectadorDuenio,setEspectadorDuenio] = useState(false)
 
     useEffect(() => {
         axios.get(config.API_URL+config.REACT_APP_BACKEND_GETITEMSCATALOGOPRODUCTO+ `?&producto_id=${catItem.item.producto.id}`).then(res => {
@@ -70,9 +71,27 @@ function CatItem({ catItem,id,horaComienzoSubasta,horaFinSubasta,fechaSubasta,su
                     console.log(err);
                 });
     },[loading])
-    
+
     useEffect(() => {
-            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETULTIMAPUJA+ `?&producto_id=${catItem.item.producto.id}`).then(res2 => {
+        if(userLogged){   
+            const userIdActual=currentUser.uid  
+            axios.get(config.API_URL+config.REACT_APP_BACKEND_GETESDUENIO+ `?&user_id=${userIdActual}&producto_id=${catItem.item.producto.id}`).then(res => {
+                    if(res.data){
+                        setEspectadorDuenio(true)
+                     }
+                    else{
+                        setEspectadorDuenio(false)
+                    }
+                    setLoading(false)
+                    }).catch(err => {
+                        console.log(err);
+                    });
+        }
+        },[loading])
+    
+
+    useEffect(() => {
+        axios.get(config.API_URL+config.REACT_APP_BACKEND_GETULTIMAPUJA+ `?&producto_id=${catItem.item.producto.id}`).then(res2 => {
             const oldDate = new Date(res2.data.created_at);
             const day = oldDate.getDate();
             const month = oldDate.getMonth() + 1;
@@ -207,14 +226,18 @@ function CatItem({ catItem,id,horaComienzoSubasta,horaFinSubasta,fechaSubasta,su
         },[])
     )  
    
-    return (
+     return (
         <TouchableOpacity>
             <View style={styles.viewCatitem}>
                 <View>
                     <Text style={styles.catitemTitle}>Producto: {catItem.item.producto.descripcionCatalogo}</Text>
                     <Text style={styles.catitemInformation}>Descripción: {catItem.item.producto.descripcionCompleta}</Text>
                     { 
-                        userLogged && !subastaNoValida ? 
+                        espectadorDuenio ? 
+                            <Text style={styles.mensajes} >
+                            Al terminar la subasta se te informarán los resultados.
+                            </Text>
+                        : userLogged && !subastaNoValida ? 
                             <Button
                                 buttonStyle={styles.btnAddPayment}
                                 title="Ver precio"

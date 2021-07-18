@@ -53,7 +53,6 @@ export default function miSubasta({ navigation, route }) {
 
     useEffect(() => {
         setLoading(false)
-        console.log("este es el id item",idItem)
             axios.get(config.API_URL+config.REACT_APP_BACKEND_GETSUBASTAPRODUCTO + `?&producto_id=${idItem}`).then(res => {
                 setSubastaProducto(res.data);
                 console.log("esta es la res data",res.data)
